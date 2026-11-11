@@ -1,0 +1,44 @@
+[project]
+name = "clipforge"
+version = "0.1.0"
+description = "Backend ClipForge : pipeline VOD vers clips verticaux"
+readme = "README.md"
+authors = [
+    { name = "WoldenMn" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=0.120.2",
+    "fastapi[standard]>=0.141.1",
+    "faster-whisper>=1.2.1",
+    "numpy>=2.5.1",
+    "nvidia-cublas-cu12>=12.9.2.10",
+    "nvidia-cudnn-cu12==9.*",
+    "yt-dlp>=2026.7.4",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.1,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.1",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# E501 garde line-length : la selection par defaut (E4, E7, E9, F) ne l'inclut pas,
+# et une limite que rien ne verifie redevient fausse au premier commit.
+extend-select = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: tests lents (ffmpeg/whisper reels)"]

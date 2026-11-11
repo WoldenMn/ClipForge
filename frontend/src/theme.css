@@ -1,0 +1,142 @@
+/* Identite visuelle ClipForge : charbon chaud + ambre de l'icone (assets/icon.svg).
+   Tous les couples texte/fond sont mesures >= 4.5:1 (AA), les bordures de
+   controle et anneaux de focus >= 3:1 (WCAG 1.4.11). Cible : Windows desktop. */
+
+@theme {
+  --font-sans: "Segoe UI", "Segoe UI Variable Text", system-ui, sans-serif;
+  --font-mono: "Cascadia Mono", Consolas, "Courier New", monospace;
+
+  /* Surfaces, du plus profond au plus proche. Entre deux quasi-noirs le ratio
+     WCAG ne dit plus rien (le terme de voile ecrase tout) : c'est l'ecart de
+     clarte L* qui gouverne. Marches : 2.78 / 3.28 / 4.96 — well etait a 1.63 de
+     canvas, invisible a l'ecran, d'ou le passage au noir franc. */
+  --color-well: #000000;
+  --color-canvas: #0b0a09;
+  --color-surface: #16130f;
+  --color-surface-hi: #211d17;
+
+  /* Traits : line = decoratif, line-control = frontiere de champ (3.13 min) */
+  --color-line: #292420;
+  --color-line-strong: #3b342b;
+  --color-line-control: #74695d;
+
+  /* Texte : 16.03 / 8.16 / 4.91 sur --color-surface */
+  --color-ink: #f2eee9;
+  --color-ink-soft: #b3aba1;
+  --color-ink-dim: #8b8279;
+
+  /* Ambre : repos / survol / enfonce, plus le fond teinte et son encre */
+  --color-accent: #f59e0b;
+  --color-accent-hi: #fbbf24;
+  --color-accent-lo: #d97706;
+  --color-accent-soft: rgb(245 158 11 / 0.14);
+  --color-on-accent: #1a1203;
+
+  --color-danger: #ef4444;
+  --color-danger-fill: #b91c1c;
+  --color-danger-ink: #fca5a5;
+  --color-danger-soft: rgb(239 68 68 / 0.15);
+  --color-on-danger: #fff1f1;
+
+  --color-ok: #22c55e;
+  --color-ok-fill: #15803d;
+  --color-ok-ink: #6ee7a8;
+  --color-ok-soft: rgb(34 197 94 / 0.15);
+  --color-on-ok: #f0fdf4;
+
+  --color-info: #38bdf8;
+  --color-info-fill: #075985;
+  --color-info-ink: #7cc4fa;
+  --color-info-soft: rgb(56 189 248 / 0.15);
+  --color-on-info: #f0f9ff;
+
+  --color-mute: #74695d;
+  --color-mute-fill: #3b342b;
+  --color-mute-ink: #dcd6cf;
+  --color-mute-soft: rgb(242 238 233 / 0.09);
+  --color-on-mute: #f2eee9;
+
+  --radius-control: 0.5rem;
+  --radius-card: 0.875rem;
+
+  /* L'ombre porte un liseré interne clair : sur fond sombre, c'est lui qui
+     donne le relief, l'ombre seule ne se voit presque pas. */
+  --shadow-card:
+    inset 0 1px 0 rgb(255 255 255 / 0.045), 0 1px 2px rgb(0 0 0 / 0.5),
+    0 6px 16px -10px rgb(0 0 0 / 0.7);
+  --shadow-lift:
+    inset 0 1px 0 rgb(255 255 255 / 0.07), 0 2px 4px rgb(0 0 0 / 0.45),
+    0 14px 30px -12px rgb(0 0 0 / 0.75);
+  --shadow-pop: 0 20px 48px -16px rgb(0 0 0 / 0.85);
+  --shadow-glow: 0 6px 22px -10px rgb(245 158 11 / 0.65);
+
+  --ease-soft: cubic-bezier(0.2, 0, 0, 1);
+  --animate-rise: rise 150ms var(--ease-soft) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    background-color: var(--color-canvas);
+  }
+
+  /* Halo ambre tres dilue en haut de page : rattache l'app a son icone sans
+     rien couter en lisibilite (ink-dim reste a 4.93:1 sous le halo). */
+  body {
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    background-image: radial-gradient(
+      64rem 36rem at 50% -14rem,
+      rgb(245 158 11 / 0.055),
+      transparent 70%
+    );
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-control) transparent;
+  }
+
+  ::selection {
+    background-color: rgb(245 158 11 / 0.3);
+    color: var(--color-ink);
+  }
+
+  /* Un seul anneau de focus pour toute l'app, primitives comprises. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+/* Hors @layer volontairement : une declaration sans couche l'emporte sur
+   toutes les couches, donc sur les utilitaires Tailwind (duration-150,
+   animate-rise). Dans @layer base, ce bloc serait sans effet. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
+  }
+}

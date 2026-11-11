@@ -1,0 +1,11 @@
+{
+  "video": {"id": "999", "length": 120.0},
+  "comments": [
+    {"content_offset_seconds": 5.0, "commenter": {"display_name": "a"}, "message": {"body": "salut", "fragments": [{"text": "salut", "emoticon": null}]}},
+    {"content_offset_seconds": 61.0, "commenter": {"display_name": "b"}, "message": {"body": "LUL", "fragments": [{"text": "LUL", "emoticon": {"emoticon_id": "1"}}]}},
+    {"content_offset_seconds": 61.5, "commenter": {"display_name": "c"}, "message": {"body": "LUL LUL", "fragments": [{"text": "LUL LUL", "emoticon": {"emoticon_id": "1"}}]}},
+    {"content_offset_seconds": 62.0, "commenter": {"display_name": "d"}, "message": {"body": "ENORME", "fragments": [{"text": "ENORME", "emoticon": null}]}},
+    {"content_offset_seconds": 62.5, "commenter": {"display_name": "e"}, "message": {"body": "clip ca", "fragments": [{"text": "clip ca", "emoticon": null}]}},
+    {"content_offset_seconds": 63.0, "commenter": {"display_name": "f"}, "message": {"body": "LUL", "fragments": [{"text": "LUL", "emoticon": {"emoticon_id": "1"}}]}}
+  ]
+}

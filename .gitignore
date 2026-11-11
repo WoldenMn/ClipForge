@@ -1,0 +1,30 @@
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/schemas/
+.venv/
+__pycache__/
+*.pyc
+data/
+backend/tests/fixtures/*.mp4
+.env
+.env.*
+!.env.example
+Thumbs.db
+_poubelle/
+
+# conventions locales de poste : jamais partagees
+_archive/
+_backup/
+_corr/
+_perso/
+audits/
+# plans de travail : notes locales, hors du depot public
+docs/plans/
+# secrets et config machine
+*.pem
+*.key
+# outillage Claude Code : config specifique a la machine
+.claude/settings.local.json
+.claude/launch.json
+.superpowers/

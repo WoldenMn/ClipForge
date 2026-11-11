@@ -1,0 +1,29 @@
+# Plumber — surcouche de ce depot.
+#
+# Portee reelle de l'heritage : `extends` reprend plumber:default, soit 24 des
+# 59 controles github du catalogue (`plumber catalog`). Les 35 autres restent
+# eteints. Un score « 100/100 » porte sur les controles evalues, pas sur le
+# catalogue entier. Deux controles qui garderaient ce durcissement existent au
+# catalogue mais ne sont PAS configurables en v0.5.3 (la config les refuse avec
+# « Unknown control ») : actionPinCommentsMustMatchSha, qui verifie qu'un
+# commentaire `# vX.Y.Z` ne ment pas sur le SHA epingle, et
+# workflowMustPinPackageInstalls, qui detecte un outil installe sans version
+# figee. A activer des que la version de Plumber les accepte.
+#
+# branchMustBeProtected : desactive, techniquement inapplicable ici.
+# L'API GitHub repond 403 "Upgrade to GitHub Pro or make this repository
+# public" sur branches/<defaut>/protection ET sur rulesets : depot prive sur
+# un plan sans cette fonctionnalite (verifie le 2026-09-19). Le laisser actif
+# plafonne le score a 30/E derriere un critique incorrigible et masque les
+# findings reels. A reactiver si le depot passe public ou le compte en Pro.
+#
+# Epinglage par SHA : il porte sur les actions tierces. Les actions actions/* et
+# github/* restent sur des tags mutables, exemptees par la baseline — un choix,
+# pas un oubli.
+extends: plumber:default
+version: "2.0"
+
+github:
+  controls:
+    branchMustBeProtected:
+      enabled: false

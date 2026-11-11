@@ -1,0 +1,13 @@
+[package]
+name = "clipforge"
+version = "1.0.0"
+description = "ClipForge - autoclipper de streams"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2.11", features = [] }
+tauri-plugin-shell = "2.3"
+serde_json = "1"

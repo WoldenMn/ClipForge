@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+permissions: {}
+
+jobs:
+  backend:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Installer uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: "0.12.12"
+          enable-cache: false
+      - name: Dependances
+        run: uv sync
+      # Le runner ubuntu ne fournit plus ffmpeg. Sans lui, scripts/make_fixture.py
+      # ne peut pas generer tests/fixtures/fixture.mp4 et
+      # test_montage_actif_avec_trou_muet_coupe_et_borne_les_temps echoue, faute de
+      # source video le pipeline basculant sur un layout split/vstack sans aucune
+      # coupe. Mesure sur ce meme commit : sans ffmpeg 1 failed, 570 passed ; avec
+      # ffmpeg 558 passed, 0 failed. Les 4 « skipped » du journal n'ont rien a voir
+      # avec ffmpeg -- ils tombent sur tout runner Linux sans GPU (skipif win32 de
+      # test_winjob et test_gpu_path, nvidia-smi absent pour test_diagnostic) et y
+      # sont encore apres ce correctif. `-version` journalise la version obtenue.
+      - name: Installer ffmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          ffmpeg -version | head -1
+      - name: Lint
+        run: uv run ruff check .
+      - name: Tests unitaires
+        run: uv run pytest -q -m "not integration"
+
+  # Job a part, et non une etape de plus dans `backend` : ces tests lancent
+  # ffmpeg et whisper pour de vrai, et l'un d'eux telecharge son modele. Les
+  # melanger au garde-fou rapide de chaque PR abimerait ce signal-la, alors
+  # qu'ici les deux jobs tournent en parallele et se diagnostiquent separement.
+  # Pas de continue-on-error : un test qui ne compte pas ne sert a rien.
+  # ubuntu-26.04 pour le seul job qui rend pour de vrai : le montage V6 passe
+  # son graphe par -/filter_complex, option apparue avec ffmpeg 7.0, qu'une
+  # version anterieure refuse en bloc. `apt-get install ffmpeg` rend 6.1.1 sur
+  # ubuntu-24.04 (lu dans le run 36237055086) et 8.0.1 sur ubuntu-26.04
+  # (mesure en conteneur). L'etiquette ubuntu-latest passera a 26.04 en
+  # novembre 2026 (actions/runner-images#14748) : cette ligne pourra disparaitre.
+  integration:
+    permissions:
+      contents: read
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15   # un telechargement de modele qui pend couterait 6 h par defaut
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Installer uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: "0.12.12"
+          enable-cache: false
+      - name: Dependances
+        run: uv sync
+      - name: Installer ffmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          ffmpeg -version | head -1
+      # -rs liste les tests sautes : sur ce runner, un skip silencieux serait
+      # indiscernable d'un test qui passe.
+      - name: Tests integration
+        run: uv run pytest -q -rs -m integration
+
+  frontend:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: latest
+      - name: Dependances
+        run: bun install --frozen-lockfile
+      - name: Lint
+        run: bun run lint
+      - name: Tests unitaires
+        run: bun run test
+      - name: Build
+        run: bun run build
